@@ -45,7 +45,7 @@ const AdminDeals = () => {
       <div className="w-full flex-1 p-6">
         {/* Details */}
         <div className="flex justify-between items-center gap-2">
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-2">
             <h1 className="text-5xl md:w-6xl font-semibold">Active Deals</h1>
 
             <p className="text-gray-500 text-sm md:text-xl">
