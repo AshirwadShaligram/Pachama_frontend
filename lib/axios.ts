@@ -41,8 +41,14 @@ axiosApi.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
 
         return axiosApi(originalRequest);
-      } catch {
-        console.error("Session expired");
+      } catch (refreshError) {
+        if (axios.isAxiosError(refreshError)) {
+          console.error(
+            "Refresh failed:",
+            refreshError.response?.status,
+            refreshError.response?.data,
+          );
+        }
         setToken(null);
       }
     }

@@ -4,6 +4,7 @@ import "./globals.css";
 import ReduxProvider from "@/redux/providers/ReduxProvider";
 import AuthProvider from "@/redux/providers/AuthProvider";
 import { Toaster } from "sonner";
+import QueryProvider from "@/redux/providers/QueryProvider";
 
 const roboto = Roboto({
   weight: "400",
@@ -26,9 +27,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={roboto.className}>
       <body className="min-h-full flex flex-col">
-        <ReduxProvider>
-          <AuthProvider>{children}</AuthProvider>
-        </ReduxProvider>
+        <QueryProvider>
+          <ReduxProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </ReduxProvider>
+        </QueryProvider>
         <Toaster />
       </body>
     </html>

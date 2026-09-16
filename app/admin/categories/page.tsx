@@ -1,22 +1,36 @@
+"use client";
+
+import CategoryGrid from "@/components/admin/categories/CategoryGrid";
+import CreateCategoryPage from "@/components/admin/categories/CreateCategoryPage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { adminCategories } from "@/data/categories";
+import { useCategories } from "@/hooks/useCategories";
+import { useState } from "react";
 import { Bezier2, Edit, EyeClosed, EyeOpen, Plus, Shop3 } from "reicon-react";
 
 const AdminCategories = () => {
-  const totalActive = adminCategories.filter(
+  const [showCreateCategory, setShowCreateCategory] = useState(false);
+
+  const { data: categories } = useCategories();
+
+  const totalActive = categories?.filter(
     (category) => category.isVisible,
   ).length;
 
-  const itemMapped = adminCategories.reduce(
+  const itemMapped = categories?.reduce(
     (total, category) => total + category.activeProducts,
     0,
   );
 
-  const hiddenStructures = adminCategories.filter(
+  const hiddenStructures = categories?.filter(
     (category) => !category.isVisible,
   ).length;
+
+  if (showCreateCategory) {
+    return <CreateCategoryPage onBack={() => setShowCreateCategory(false)} />;
+  }
 
   return (
     <div className="h-full flex flex-col items-center border-l">
@@ -36,7 +50,10 @@ const AdminCategories = () => {
           </div>
 
           <div>
-            <Button className="md:w-40 md:h-12 font-semibold md:text-lg">
+            <Button
+              className="md:w-40 md:h-12 font-semibold md:text-lg"
+              onClick={() => setShowCreateCategory(true)}
+            >
               <Plus />
               New Category
             </Button>
@@ -77,72 +94,7 @@ const AdminCategories = () => {
         {/* Category Data */}
         <div className="mt-8 space-y-6">
           <section>
-            {adminCategories.length === 0 ? (
-              <div className="rounded-lg border border-dashed p-8 text-center">
-                <p className="text-muted-foreground">No categories</p>
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {adminCategories.map((deal) => {
-                  const Logo = deal.logo;
-
-                  return (
-                    <div
-                      key={deal.id}
-                      className="relative h-160 rounded-xl border bg-card p-5 shadow-sm flex flex-col"
-                    >
-                      {/* Category Logo */}
-                      <span className="absolute w-12 h-12 bottom-74 left-10 border-2 flex items-center justify-center rounded-lg text-white bg-black">
-                        <Logo size={28} />
-                      </span>
-
-                      <div className="flex-1">1</div>
-
-                      <div className="flex-1 flex justify-center flex-col p-3 gap-3">
-                        <div className="flex flex-col gap-2">
-                          <h1 className="text-3xl font-bold">{deal.title}</h1>
-
-                          <p className="text-gray-600">{deal.description}</p>
-                        </div>
-
-                        <div className="border-t flex flex-col gap-2">
-                          <span className="flex justify-between mt-3">
-                            <h1 className="font-semibold">SUB-CATEGORIES</h1>
-                            <p>{deal.subCategories.length}</p>
-                          </span>
-
-                          <span className="flex justify-between mt-3">
-                            <h1 className="font-semibold">ACTIVE PRODUCTS</h1>
-                            <p>{deal.activeProducts}</p>
-                          </span>
-                        </div>
-
-                        <div className="flex justify-between">
-                          <Button className="w-24 md:w-32 md:h-10">
-                            <Edit />
-                            <span className="font-semibold">Edit</span>
-                          </Button>
-
-                          <Button className="w-24 md:w-32 md:h-10">
-                            {deal.isVisible ? (
-                              <span className="flex gap-2 items-center justify-center">
-                                <EyeClosed />
-                                <span className="font-semibold">Hide</span>
-                              </span>
-                            ) : (
-                              <span className="flex gap-2 items-center justify-center">
-                                <EyeOpen />
-                                <span className="font-semibold">Show</span>
-                              </span>
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            <CategoryGrid />
           </section>
         </div>
       </div>

@@ -1,22 +1,64 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { AdminCategories } from "@/types/CategoryTypes";
+import { CategoryIconName, categoryIcons } from "@/lib/category-icons";
+import { toggleCategoryService } from "@/services/categoryService";
+import { CategoryResponse } from "@/types/CategoryTypes";
+import {
+  QueryClient,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { Edit, EyeClosed, EyeOpen } from "reicon-react";
 
 interface CategoryCardProps {
-  category: AdminCategories;
+  category: CategoryResponse;
 }
 
 const CategoryCard = ({ category }: CategoryCardProps) => {
-  const Logo = category.logo;
+  const [isToggling, setIsToggling] = useState(false);
+
+  const categoryIcon = categoryIcons[category.logo as CategoryIconName];
+
+  const Logo = categoryIcon?.icon;
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    console.log("Category: ", category);
+  }, [category]);
+
+  const toggleCategoryMutation = useMutation({
+    mutationFn: toggleCategoryService,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["categories"],
+      });
+    },
+    onError: (error) => {
+      console.error("Failed to toggle category:", error);
+    },
+  });
 
   return (
     <div className="relative h-160 rounded-xl border bg-card p-5 shadow-sm flex flex-col">
       {/* Category Image */}
-      <div className="flex-1 bg-amber-200">{/* Image will go here */}</div>
+      <div className="flex-1">
+        <Image
+          src={category.image}
+          alt={category.title}
+          width={800}
+          height={600}
+          style={{ width: "100%", height: "100%" }}
+          className="object-cover"
+          loading="eager"
+        />
+      </div>
 
-      {/* Logo */}
-      <span className="absolute w-12 h-12 bottom-74 left-10 border-2 bg-blue-500 flex items-center justify-center rounded-lg">
-        <Logo size={28} />
+      {/* Icon */}
+      <span className="absolute w-12 h-12 bottom-74 left-10 border-2 flex items-center justify-center rounded-lg bg-black/70 text-white">
+        {Logo && <Logo size={24} className="text-white" />}
       </span>
 
       <div className="flex-1 flex justify-center flex-col p-3 gap-3">
@@ -44,16 +86,20 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
             Edit
           </Button>
 
-          <Button className="w-24 md:w-32 md:h-10">
+          <Button
+            className="w-24 md:w-32 md:h-10"
+            onClick={() => toggleCategoryMutation.mutate(category.id)}
+            disabled={toggleCategoryMutation.isPending}
+          >
             {category.isVisible ? (
               <span className="flex gap-2 items-center">
                 <EyeClosed />
-                Hide
+                {toggleCategoryMutation.isPending ? "Hiding..." : "Hide"}
               </span>
             ) : (
               <span className="flex gap-2 items-center">
                 <EyeOpen />
-                Show
+                {toggleCategoryMutation.isPending ? "Showing..." : "Show"}
               </span>
             )}
           </Button>

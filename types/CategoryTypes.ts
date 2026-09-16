@@ -1,26 +1,29 @@
-import { ComponentType } from "react";
-
-export interface Category {
+export interface CreateCategoryRequest {
   title: string;
   description: string;
-  image: string;
-  icon: ComponentType<{ size?: number; className?: string }>;
-  href: string;
+  logo: string;
+  image: File;
 }
 
-export interface AdminCategories {
+export interface CategoryResponse {
   id: string;
   title: string;
   description: string;
-  image: string;
-  logo: ComponentType<{ size?: number; className?: string }>;
+  logo: string;
   isVisible: boolean;
   activeProducts: number;
-  subCategories: SubCategories[];
+  image: string;
+  subCategories: SubCategoryResponse[];
 }
 
-interface SubCategories {
-  id: number;
+export interface SubCategoryResponse {
+  id: string;
   name: string;
   isVisible: boolean;
+  categoryId: string;
+}
+
+export interface CreateCategoryResponse {
+  message: string;
+  category: CategoryResponse;
 }
